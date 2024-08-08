@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllTrainLocations, getTrainLocation } = require('../controllers/train');
+const { getAllTrainLocations, getTrainLocation, getTrainHistory } = require('../controllers/train');
 
 
 const router = express.Router();
@@ -9,6 +9,9 @@ router.get('/', getAllTrainLocations);
 
 // Route for retrieving a specific train's location
 router.get('/:deviceId', getTrainLocation);
+
+// Route for retrieving historical location data for a specific train
+router.get('/:deviceId/history', getTrainHistory);
 
 module.exports = router;
 
