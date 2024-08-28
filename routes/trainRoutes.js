@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', getAllTrainLocations);
 
 // Route for retrieving a specific train's location
-router.get('/:deviceId', getTrainLocation);
+router.get('/:engine_id', getTrainLocation);
 
 // Route for retrieving historical location data for a specific train
 router.get('/:deviceId/history', getTrainHistory);

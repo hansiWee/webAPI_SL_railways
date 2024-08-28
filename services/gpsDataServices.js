@@ -1,0 +1,37 @@
+const mongoose = require('mongoose');
+const GpsData = require('../models/GpsData'); // Adjust the path as necessary
+
+// Function to save GPS data to MongoDB
+async function saveGpsData(gpsData) {
+  // Check if all required fields are present
+  const requiredFields = ['signal_strength', 'speed', 'timestamp', 'longitude', 'latitude', 'train_no'];
+  const missingFields = requiredFields.filter(field => !gpsData.hasOwnProperty(field));
+
+  if (missingFields.length > 0) {
+    console.error('Missing required fields:', missingFields);
+    return;
+  }
+
+  // Save the GPS data to MongoDB
+  const newGpsData = new GpsData(gpsData);
+  try {
+    const savedData = await newGpsData.save();
+    console.log('GPS data saved:', savedData);
+  } catch (err) {
+    console.error('Error saving GPS data:', err);
+  }
+}
+
+// Function to get all GPS data
+async function getAllGpsData() {
+  try {
+      const gpsData = await GpsData.find().sort({ timestamp: 1 });
+      console.log('Retrieved all GPS data:', gpsData);
+      return gpsData;
+  } catch (err) {
+      console.error('Error retrieving all GPS data:', err);
+      throw err;
+  }
+}
+
+module.exports = { saveGpsData, getAllGpsData };
