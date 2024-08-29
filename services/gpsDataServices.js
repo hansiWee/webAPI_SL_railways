@@ -1,37 +1,57 @@
-const mongoose = require('mongoose');
-const GpsData = require('../models/GpsData'); // Adjust the path as necessary
+// services/gpsDataService.js
+const GpsData = require('../models/GpsData');
 
-// Function to save GPS data to MongoDB
-async function saveGpsData(gpsData) {
-  // Check if all required fields are present
-  const requiredFields = ['signal_strength', 'speed', 'timestamp', 'longitude', 'latitude', 'train_no'];
-  const missingFields = requiredFields.filter(field => !gpsData.hasOwnProperty(field));
+const clients = [];
 
-  if (missingFields.length > 0) {
-    console.error('Missing required fields:', missingFields);
-    return;
-  }
-
-  // Save the GPS data to MongoDB
-  const newGpsData = new GpsData(gpsData);
-  try {
-    const savedData = await newGpsData.save();
-    console.log('GPS data saved:', savedData);
-  } catch (err) {
-    console.error('Error saving GPS data:', err);
-  }
+// Manages SSE clients
+function addClient(res) {
+    clients.push(res);
+    res.on('close', () => {
+        removeClient(res);
+    });
 }
 
-// Function to get all GPS data
-async function getAllGpsData() {
-  try {
-      const gpsData = await GpsData.find().sort({ timestamp: 1 });
-      console.log('Retrieved all GPS data:', gpsData);
-      return gpsData;
-  } catch (err) {
-      console.error('Error retrieving all GPS data:', err);
-      throw err;
-  }
+function removeClient(res) {
+    const index = clients.indexOf(res);
+    if (index !== -1) {
+        clients.splice(index, 1);
+    }
 }
 
-module.exports = { saveGpsData, getAllGpsData };
+function sendToAllClients(data) {
+    clients.forEach(res => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+    });
+}
+
+async function saveGpsData(data) {
+    try {
+
+        sendToAllClients(data);
+        const gpsData = new GpsData(data);
+        await gpsData.save();
+        // Broadcast the saved data to all SSE clients
+        return gpsData;
+    } catch (error) {
+        console.error('Error saving GPS data:', error);
+        throw new Error('Error saving GPS data');
+    }
+}
+
+const deleteOldData = async () => {
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+    try {
+        const result = await DataModel.deleteMany({ createdAt: { $lt: ninetyDaysAgo } });
+        return result.deletedCount; // Return the count of deleted records
+    } catch (error) {
+        throw new Error(`Failed to delete old data: ${error.message}`);
+    }
+}
+
+module.exports = {
+    saveGpsData,
+    addClient,
+    deleteOldData
+};
