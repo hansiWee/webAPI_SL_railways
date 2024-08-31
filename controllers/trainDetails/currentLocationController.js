@@ -1,5 +1,6 @@
+
 const moment = require('moment');
-const { getLatestTrainLocation } = require('../../services/trainDetails/currentLocationServices');
+const  {getLatestTrainLocation } = require('../../services/trainDetails/currentLocationServices');
 
 exports.getTrainLocation = async (req, res) => {
   const { train_no } = req.params;
