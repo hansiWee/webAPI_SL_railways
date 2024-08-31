@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/status/:train_no', trainStatus.getTrainStatus);
 router.get('/location/:train_no', trainLocationController.getTrainLocation);
-router.get('/station/:name', stationController.getTrainsNearStation);
+router.get('/stations', stationController.getStations);
 
 
 
