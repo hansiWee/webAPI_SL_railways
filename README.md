@@ -13,7 +13,8 @@
 - Modular architecture following MVM principles.
 - Custom utilities for scheduling tasks (cron jobs).
 
-## Project Structure
+## Deployement 
+The backend API for real-time train tracking is deployed on AWS Elastic Beanstalk and can be accessed http://webapi-env-1.eba-pm8z2wfh.ap-south-1.elasticbeanstalk.com/
 
 ```plaintext
 WEBAPI_SL_RAILWAYS/
